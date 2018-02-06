@@ -26,7 +26,7 @@ data_dir_list = os.listdir(data_path)
 img_rows=128
 img_cols=128
 num_channel=1
-num_epoch=10
+num_epoch=20
 
 # Define the number of classes
 num_classes = 4
@@ -199,37 +199,36 @@ checkpoint = callbacks.ModelCheckpoint(filepath, monitor='val_loss', verbose=1, 
 
 callbacks_list = [csv_log,early_stopping,checkpoint]
 
-hist = model.fit(X_train, y_train, batch_size=16, epochs=num_epoch, verbose=1, validation_data=(X_test, y_test),callbacks=callbacks_list)
-print('shubham')
-
+#hist = model.fit(X_train, y_train, batch_size=16, epochs=num_epoch, verbose=1, validation_data=(X_test, y_test),callbacks=callbacks_list)
+hist2=model.fit(X_train,y_train,batch_size=32,epochs=num_epoch,verbose=1,validation_split=0.2,callbacks=callbacks_list)
 ## visualizing losses and accuracy
-#train_loss=hist.history['loss']
-#val_loss=hist.history['val_loss']
-#train_acc=hist.history['acc']
-#val_acc=hist.history['val_acc']
-#xc=range(num_epoch)
+train_loss=hist.history['loss']
+val_loss=hist.history['val_loss']
+train_acc=hist.history['acc']
+val_acc=hist.history['val_acc']
+xc=range(num_epoch)
 
-#plt.figure(1,figsize=(7,5))
-#plt.plot(xc,train_loss)
-#plt.plot(xc,val_loss)
-#plt.xlabel('num of Epochs')
-#plt.ylabel('loss')
-#plt.title('train_loss vs val_loss')
-#plt.grid(True)
-#plt.legend(['train','val'])
-##print plt.style.available # use bmh, classic,ggplot for big pictures
-#plt.style.use(['classic'])
-#
-#plt.figure(2,figsize=(7,5))
-#plt.plot(xc,train_acc)
-#plt.plot(xc,val_acc)
-#plt.xlabel('num of Epochs')
-#plt.ylabel('accuracy')
-#plt.title('train_acc vs val_acc')
-#plt.grid(True)
-#plt.legend(['train','val'],loc=4)
-##print plt.style.available # use bmh, classic,ggplot for big pictures
-#plt.style.use(['classic'])
+plt.figure(1,figsize=(7,5))
+plt.plot(xc,train_loss)
+plt.plot(xc,val_loss)
+plt.xlabel('num of Epochs')
+plt.ylabel('loss')
+plt.title('train_loss vs val_loss')
+plt.grid(True)
+plt.legend(['train','val'])
+#print(plt.style.available) # use bmh, classic,ggplot for big pictures
+plt.style.use(['classic'])
+
+plt.figure(2,figsize=(7,5))
+plt.plot(xc,train_acc)
+plt.plot(xc,val_acc)
+plt.xlabel('num of Epochs')
+plt.ylabel('accuracy')
+plt.title('train_acc vs val_acc')
+plt.grid(True)
+plt.legend(['train','val'],loc=4)
+#print plt.style.available # use bmh, classic,ggplot for big pictures
+plt.style.use(['classic'])
 
 #%%
 
