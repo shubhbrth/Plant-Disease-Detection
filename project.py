@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 
 from sklearn.utils import shuffle
 from sklearn.model_selection import train_test_split
-		
+        
 from keras import backend as K
 K.set_image_dim_ordering('th')
 
@@ -26,7 +26,7 @@ data_dir_list = os.listdir(data_path)
 img_rows=128
 img_cols=128
 num_channel=1
-num_epoch=20
+num_epoch=30
 
 # Define the number of classes
 num_classes = 4
@@ -34,13 +34,13 @@ num_classes = 4
 img_data_list=[]
 
 for dataset in data_dir_list:
-	img_list=os.listdir(data_path+'/'+ dataset)
-	print ('Loaded the images of dataset-'+'{}\n'.format(dataset))
-	for img in img_list:
-		input_img=cv2.imread(data_path + '/'+ dataset + '/'+ img )
-		input_img=cv2.cvtColor(input_img, cv2.COLOR_BGR2GRAY)
-		input_img_resize=cv2.resize(input_img,(128,128))
-		img_data_list.append(input_img_resize)
+    img_list=os.listdir(data_path+'/'+ dataset)
+    print ('Loaded the images of dataset-'+'{}\n'.format(dataset))
+    for img in img_list:
+        input_img=cv2.imread(data_path + '/'+ dataset + '/'+ img )
+        input_img=cv2.cvtColor(input_img, cv2.COLOR_BGR2GRAY)
+        input_img_resize=cv2.resize(input_img,(img_rows,img_cols))
+        img_data_list.append(input_img_resize)
 
 img_data = np.array(img_data_list)
 img_data = img_data.astype('float32')
@@ -48,71 +48,71 @@ img_data /= 255
 print (img_data.shape)
 
 if num_channel==1:
-	if K.image_dim_ordering()=='th':
-		img_data= np.expand_dims(img_data, axis=1) 
-		print (img_data.shape)
-	else:
-		img_data= np.expand_dims(img_data, axis=4) 
-		print (img_data.shape)
-		
+    if K.image_dim_ordering()=='th':
+        img_data= np.expand_dims(img_data, axis=1) 
+        print (img_data.shape)
+    else:
+        img_data= np.expand_dims(img_data, axis=4) 
+        print (img_data.shape)
+        
 else:
-	if K.image_dim_ordering()=='th':
-		img_data=np.rollaxis(img_data,3,1)
-		print (img_data.shape)
-		
+    if K.image_dim_ordering()=='th':
+        img_data=np.rollaxis(img_data,3,1)
+        print (img_data.shape)
+        
 #%%
 USE_SKLEARN_PREPROCESSING=False
 
 if USE_SKLEARN_PREPROCESSING:
-	# using sklearn for preprocessing
-	from sklearn import preprocessing
-	
-	def image_to_feature_vector(image, size=(128, 128)):
-		# resize the image to a fixed size, then flatten the image into
-		# a list of raw pixel intensities
-		return cv2.resize(image, size).flatten()
-	
-	img_data_list=[]
-	for dataset in data_dir_list:
-		img_list=os.listdir(data_path+'/'+ dataset)
-		print ('Loaded the images of dataset-'+'{}\n'.format(dataset))
-		for img in img_list:
-			input_img=cv2.imread(data_path + '/'+ dataset + '/'+ img )
-			input_img=cv2.cvtColor(input_img, cv2.COLOR_BAYER_BG2GRAY)
-			input_img_flatten=image_to_feature_vector(input_img,(128,128))
-			img_data_list.append(input_img_flatten)
-	
-	img_data = np.array(img_data_list)
-	img_data = img_data.astype('float32')
-	print (img_data.shape)
-	img_data_scaled = preprocessing.scale(img_data)
-	print (img_data_scaled.shape)
-	
-	print (np.mean(img_data_scaled))
-	print (np.std(img_data_scaled))
-	
-	print (img_data_scaled.mean(axis=0))
-	print (img_data_scaled.std(axis=0))
-	
-	if K.image_dim_ordering()=='th':
-		img_data_scaled=img_data_scaled.reshape(img_data.shape[0],num_channel,img_rows,img_cols)
-		print (img_data_scaled.shape)
-		
-	else:
-		img_data_scaled=img_data_scaled.reshape(img_data.shape[0],img_rows,img_cols,num_channel)
-		print (img_data_scaled.shape)
-	
-	
-	if K.image_dim_ordering()=='th':
-		img_data_scaled=img_data_scaled.reshape(img_data.shape[0],num_channel,img_rows,img_cols)
-		print (img_data_scaled.shape)
-		
-	else:
-		img_data_scaled=img_data_scaled.reshape(img_data.shape[0],img_rows,img_cols,num_channel)
-		print (img_data_scaled.shape)
+    # using sklearn for preprocessing
+    from sklearn import preprocessing
+    
+    def image_to_feature_vector(image, size=(img_rows, img_cols)):
+        # resize the image to a fixed size, then flatten the image into
+        # a list of raw pixel intensities
+        return cv2.resize(image, size).flatten()
+    
+    img_data_list=[]
+    for dataset in data_dir_list:
+        img_list=os.listdir(data_path+'/'+ dataset)
+        print ('Loaded the images of dataset-'+'{}\n'.format(dataset))
+        for img in img_list:
+            input_img=cv2.imread(data_path + '/'+ dataset + '/'+ img )
+            input_img=cv2.cvtColor(input_img, cv2.COLOR_BAYER_BG2GRAY)
+            input_img_flatten=image_to_feature_vector(input_img,(img_rows,img_cols))
+            img_data_list.append(input_img_flatten)
+    
+    img_data = np.array(img_data_list)
+    img_data = img_data.astype('float32')
+    print (img_data.shape)
+    img_data_scaled = preprocessing.scale(img_data)
+    print (img_data_scaled.shape)
+    
+    print (np.mean(img_data_scaled))
+    print (np.std(img_data_scaled))
+    
+    print (img_data_scaled.mean(axis=0))
+    print (img_data_scaled.std(axis=0))
+    
+    if K.image_dim_ordering()=='th':
+        img_data_scaled=img_data_scaled.reshape(img_data.shape[0],num_channel,img_rows,img_cols)
+        print (img_data_scaled.shape)
+        
+    else:
+        img_data_scaled=img_data_scaled.reshape(img_data.shape[0],img_rows,img_cols,num_channel)
+        print (img_data_scaled.shape)
+    
+    
+    if K.image_dim_ordering()=='th':
+        img_data_scaled=img_data_scaled.reshape(img_data.shape[0],num_channel,img_rows,img_cols)
+        print (img_data_scaled.shape)
+        
+    else:
+        img_data_scaled=img_data_scaled.reshape(img_data.shape[0],img_rows,img_cols,num_channel)
+        print (img_data_scaled.shape)
 
 if USE_SKLEARN_PREPROCESSING:
-	img_data=img_data_scaled
+    img_data=img_data_scaled
 #%%
 # Assigning Labels
 
@@ -126,9 +126,9 @@ labels[0:202]=0
 labels[202:404]=1
 labels[404:606]=2
 labels[606:]=3
-	  
+      
 names = ['cats','dogs','horses','humans']
-	  
+      
 # convert class labels to on-hot encoding
 Y = np_utils.to_categorical(labels, num_classes)
 
@@ -140,7 +140,7 @@ X_train, X_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_
 #%%
 # Defining the model
 input_shape=img_data[0].shape
-					
+                    
 model = Sequential()
 
 model.add(Convolution2D(32, (3,3), activation='relu', padding='same',input_shape = (1,128,128))) # if you resize the image above, shape would be (128,128,3)
@@ -173,8 +173,8 @@ model.compile(loss='categorical_crossentropy', optimizer='rmsprop',metrics=["acc
 model.summary()
 model.get_config()
 model.layers[0].get_config()
-model.layers[0].input_shape			
-model.layers[0].output_shape			
+model.layers[0].input_shape            
+model.layers[0].output_shape            
 model.layers[0].get_weights()
 np.shape(model.layers[0].get_weights()[0])
 model.layers[0].trainable
@@ -255,24 +255,24 @@ test_image /= 255
 print (test_image.shape)
    
 if num_channel==1:
-	if K.image_dim_ordering()=='th':
-		test_image= np.expand_dims(test_image, axis=0)
-		test_image= np.expand_dims(test_image, axis=0)
-		print (test_image.shape)
-	else:
-		test_image= np.expand_dims(test_image, axis=3) 
-		test_image= np.expand_dims(test_image, axis=0)
-		print (test_image.shape)
-		
+    if K.image_dim_ordering()=='th':
+        test_image= np.expand_dims(test_image, axis=0)
+        test_image= np.expand_dims(test_image, axis=0)
+        print (test_image.shape)
+    else:
+        test_image= np.expand_dims(test_image, axis=3) 
+        test_image= np.expand_dims(test_image, axis=0)
+        print (test_image.shape)
+        
 else:
-	if K.image_dim_ordering()=='th':
-		test_image=np.rollaxis(test_image,2,0)
-		test_image= np.expand_dims(test_image, axis=0)
-		print (test_image.shape)
-	else:
-		test_image= np.expand_dims(test_image, axis=0)
-		print (test_image.shape)
-		
+    if K.image_dim_ordering()=='th':
+        test_image=np.rollaxis(test_image,2,0)
+        test_image= np.expand_dims(test_image, axis=0)
+        print (test_image.shape)
+    else:
+        test_image= np.expand_dims(test_image, axis=0)
+        print (test_image.shape)
+        
 # Predicting the test image
 print((model.predict(test_image)))
 print(model.predict_classes(test_image))
@@ -283,9 +283,9 @@ print(model.predict_classes(test_image))
 
 #
 def get_featuremaps(model, layer_idx, X_batch):
-	get_activations = K.function([model.layers[0].input, K.learning_phase()],[model.layers[layer_idx].output,])
-	activations = get_activations([X_batch,0])
-	return activations
+    get_activations = K.function([model.layers[0].input, K.learning_phase()],[model.layers[layer_idx].output,])
+    activations = get_activations([X_batch,0])
+    return activations
 
 layer_num=3
 filter_num=0
@@ -297,7 +297,7 @@ feature_maps = activations[0][0]
 print (np.shape(feature_maps))
 
 if K.image_dim_ordering()=='th':
-	feature_maps=np.rollaxis((np.rollaxis(feature_maps,2,0)),2,0)
+    feature_maps=np.rollaxis((np.rollaxis(feature_maps,2,0)),2,0)
 print (feature_maps.shape)
 
 fig=plt.figure(figsize=(16,16))
@@ -305,16 +305,16 @@ plt.imshow(feature_maps[:,:,filter_num],cmap='gray')
 plt.savefig("featuremaps-layer-{}".format(layer_num) + "-filternum-{}".format(filter_num)+'.jpg')
 
 num_of_featuremaps=feature_maps.shape[2]
-fig=plt.figure(figsize=(16,16))	
+fig=plt.figure(figsize=(16,16))    
 plt.title("featuremaps-layer-{}".format(layer_num))
 subplot_num=int(np.ceil(np.sqrt(num_of_featuremaps)))
 for i in range(int(num_of_featuremaps)):
-	ax = fig.add_subplot(subplot_num, subplot_num, i+1)
-	#ax.imshow(output_image[0,:,:,i],interpolation='nearest' ) #to see the first filter
-	ax.imshow(feature_maps[:,:,i],cmap='gray')
-	plt.xticks([])
-	plt.yticks([])
-	plt.tight_layout()
+    ax = fig.add_subplot(subplot_num, subplot_num, i+1)
+    #ax.imshow(output_image[0,:,:,i],interpolation='nearest' ) #to see the first filter
+    ax.imshow(feature_maps[:,:,i],cmap='gray')
+    plt.xticks([])
+    plt.yticks([])
+    plt.tight_layout()
 plt.show()
 fig.savefig("featuremaps-layer-{}".format(layer_num) + '.jpg')
 
@@ -330,7 +330,7 @@ print(y_pred)
 #y_pred = model.predict_classes(X_test)
 #print(y_pred)
 target_names = ['class 0(cats)', 'class 1(Dogs)', 'class 2(Horses)','class 3(Humans)']
-					
+                    
 print(classification_report(np.argmax(y_test,axis=1), y_pred,target_names=target_names))
 
 print(confusion_matrix(np.argmax(y_test,axis=1), y_pred))
