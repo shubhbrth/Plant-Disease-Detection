@@ -6,8 +6,8 @@ PATH = os.getcwd()
 data_path = PATH + '\path_test'
 data_path.replace('\\', '/')
 
-img=cv2.imread(data_path+'/'+'test1.jpg')
-img=cv2.resize(img,(128,128))
+img=cv2.imread(data_path+'/'+'img1.jpg')
+img=cv2.resize(img,(64,64))
 img=img.astype('float32')
 img/=255
 img.shape
@@ -33,6 +33,9 @@ for i in range(0,len(result[0])):
 	if result[0][i]>max:
 		max=result[0][i]
 		label=i
-category=['cat','dog','horse','human']
+		print('loop:',label)
+category=['Diseased Cotton Plant','Healthy Cotton Plant']
 print(max)
+print('last value:',label)
 print('Model Predicted this as',category[label])
+3

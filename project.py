@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 
 from sklearn.utils import shuffle
 from sklearn.model_selection import train_test_split
-        
+   
 from keras import backend as K
 K.set_image_dim_ordering('th')
 
@@ -13,23 +13,22 @@ from keras.models import Sequential
 from keras.layers.core import Dense, Dropout, Activation, Flatten
 from keras.layers.convolutional import Convolution2D, MaxPooling2D
 from keras.optimizers import SGD,RMSprop,adam
-
+from keras.layers.advanced_activations import PReLU,LeakyReLU
 #%%
 
 PATH = os.getcwd()
 # Define data path
-data_path = PATH + '\data'
+data_path = PATH + '\Dataset'
 data_path.replace('\\', '/')
 data_dir_list = os.listdir(data_path)
 
-
-img_rows=128
-img_cols=128
+img_rows=64
+img_cols=64
 num_channel=1
-num_epoch=30
-
+num_epoch=1000
+batch_size=32
 # Define the number of classes
-num_classes = 4
+num_classes = 2
 
 img_data_list=[]
 
@@ -117,17 +116,15 @@ if USE_SKLEARN_PREPROCESSING:
 # Assigning Labels
 
 # Define the number of classes
-num_classes = 4
+num_classes = 2
 
 num_of_samples = img_data.shape[0]
 labels = np.ones((num_of_samples,),dtype='int64')
 
-labels[0:202]=0
-labels[202:404]=1
-labels[404:606]=2
-labels[606:]=3
+labels[0:263]=0
+labels[263:327]=1
       
-names = ['cats','dogs','horses','humans']
+names = ['Diseased Cotton Plant','Healthy Cotton Plant']
       
 # convert class labels to on-hot encoding
 Y = np_utils.to_categorical(labels, num_classes)
@@ -143,8 +140,12 @@ input_shape=img_data[0].shape
                     
 model = Sequential()
 
-model.add(Convolution2D(32, (3,3), activation='relu', padding='same',input_shape = (1,128,128))) # if you resize the image above, shape would be (128,128,3)
+model.add(Convolution2D(32, (3,3), activation='relu', padding='same',input_shape = (num_channel,img_rows,img_cols))) # if you resize the image above, shape would be (128,128,3)
 model.add(Convolution2D(32, (3,3), activation='relu'))
+model.add(MaxPooling2D(pool_size=(2,2)))
+
+model.add(Convolution2D(64, (3,3), activation='relu', padding='same'))
+model.add(Convolution2D(64, (3,3), activation='relu'))
 model.add(MaxPooling2D(pool_size=(2,2)))
 
 model.add(Convolution2D(64, (3,3), activation='relu', padding='same'))
@@ -152,8 +153,9 @@ model.add(Convolution2D(64, (3,3), activation='relu'))
 model.add(MaxPooling2D(pool_size=(2,2)))
 model.add(Dropout(0.25))
 
+
 model.add(Convolution2D(128, (3,3), activation='relu', padding='same'))
-model.add(Convolution2D(128, (3,3), activation='relu'))
+model.add(Convolution2D(128, (3,3), activation='tanh'))
 model.add(MaxPooling2D(pool_size=(2,2)))
 model.add(Dropout(0.25))
 
@@ -181,7 +183,7 @@ model.layers[0].trainable
 #plot_model(model, to_file='model_plot.png')
 #%%
 # Training
-hist = model.fit(X_train, y_train, batch_size=16, epochs=num_epoch, verbose=1, validation_data=(X_test, y_test))
+hist = model.fit(X_train, y_train, batch_size=batch_size, epochs=num_epoch, verbose=1, validation_data=(X_test, y_test))
 
 #hist = model.fit(X_train, y_train, batch_size=32, epochs=20,verbose=1, validation_split=0.2)
 
@@ -191,11 +193,11 @@ from keras import callbacks
 filename='model_train_new.csv'
 csv_log=callbacks.CSVLogger(filename, separator=',', append=False)
 
-early_stopping=callbacks.EarlyStopping(monitor='val_loss', min_delta=0, patience=0, verbose=0, mode='min')
+early_stopping=callbacks.EarlyStopping(monitor='val_acc', min_delta=0, patience=0, verbose=0, mode='min')
 
 filepath="Best-weights-my_model-{epoch:03d}-{loss:.4f}-{acc:.4f}.hdf5"
 
-checkpoint = callbacks.ModelCheckpoint(filepath, monitor='val_loss', verbose=1, save_best_only=True, mode='min')
+checkpoint = callbacks.ModelCheckpoint(filepath, monitor='val_acc', verbose=1, save_best_only=True, mode='min')
 
 callbacks_list = [csv_log,early_stopping,checkpoint]
 
@@ -246,9 +248,9 @@ print(model.predict_classes(test_image))
 print(y_test[0:1])
 
 # Testing a new image
-test_image = cv2.imread('data/Humans/rider-8.jpg')
+test_image = cv2.imread('path_test\dimg10.jpg')
 test_image=cv2.cvtColor(test_image, cv2.COLOR_BGR2GRAY)
-test_image=cv2.resize(test_image,(128,128))
+test_image=cv2.resize(test_image,(img_rows,img_cols))
 test_image = np.array(test_image)
 test_image = test_image.astype('float32')
 test_image /= 255
@@ -329,7 +331,7 @@ y_pred = np.argmax(Y_pred, axis=1)
 print(y_pred)
 #y_pred = model.predict_classes(X_test)
 #print(y_pred)
-target_names = ['class 0(cats)', 'class 1(Dogs)', 'class 2(Horses)','class 3(Humans)']
+target_names = ['class 0(Diseased Cotton Plant)', 'class 1(Healthy Cotton)']
                     
 print(classification_report(np.argmax(y_test,axis=1), y_pred,target_names=target_names))
 
@@ -378,8 +380,7 @@ np.set_printoptions(precision=2)
 plt.figure()
 
 # Plot non-normalized confusion matrix
-plot_confusion_matrix(cnf_matrix, classes=target_names,
-                      title='Confusion matrix')
+plot_confusion_matrix(cnf_matrix, classes=target_names,title='Confusion matrix')
 #plt.figure()
 # Plot normalized confusion matrix
 #plot_confusion_matrix(cnf_matrix, classes=target_names, normalize=True,
