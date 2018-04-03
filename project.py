@@ -22,13 +22,14 @@ data_path = PATH + '\Dataset'
 data_path.replace('\\', '/')
 data_dir_list = os.listdir(data_path)
 
+num_classes=len(os.listdir(data_path))
+
 img_rows=64
 img_cols=64
 num_channel=1
 num_epoch=1000
 batch_size=32
 # Define the number of classes
-num_classes = 2
 
 img_data_list=[]
 
@@ -116,15 +117,23 @@ if USE_SKLEARN_PREPROCESSING:
 # Assigning Labels
 
 # Define the number of classes
-num_classes = 2
 
 num_of_samples = img_data.shape[0]
 labels = np.ones((num_of_samples,),dtype='int64')
 
-labels[0:263]=0
-labels[263:327]=1
+initial_label_range=0
+for i in range(num_classes):
+	final_label_range=len(os.listdir(data_path+'/'+ data_dir_list[i]))+initial_label_range
+	print("final_label_range ",final_label_range)
+	print("i ",i)
+	labels[initial_label_range:final_label_range]=i
+	initial_label_range=final_label_range
+	print("initial_label_range ",initial_label_range)
+
+#labels[0:263]=0
+#labels[263:327]=1
       
-names = ['Diseased Cotton Plant','Healthy Cotton Plant']
+names = data_dir_list
       
 # convert class labels to on-hot encoding
 Y = np_utils.to_categorical(labels, num_classes)
