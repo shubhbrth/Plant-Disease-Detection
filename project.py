@@ -22,14 +22,14 @@ data_path = PATH + '\Dataset'
 data_path.replace('\\', '/')
 data_dir_list = os.listdir(data_path)
 
+#Number of classes will be defined using number of folder present in training dataset
 num_classes=len(os.listdir(data_path))
 
 img_rows=64
 img_cols=64
 num_channel=1
-num_epoch=1000
-batch_size=32
-# Define the number of classes
+num_epoch=50
+batch_size=128
 
 img_data_list=[]
 
@@ -124,11 +124,11 @@ labels = np.ones((num_of_samples,),dtype='int64')
 initial_label_range=0
 for i in range(num_classes):
 	final_label_range=len(os.listdir(data_path+'/'+ data_dir_list[i]))+initial_label_range
-	print("final_label_range ",final_label_range)
-	print("i ",i)
+#	print("final_label_range ",final_label_range)
+#	print("i ",i)
 	labels[initial_label_range:final_label_range]=i
 	initial_label_range=final_label_range
-	print("initial_label_range ",initial_label_range)
+#	print("initial_label_range ",initial_label_range)
 
 #labels[0:263]=0
 #labels[263:327]=1
@@ -156,10 +156,12 @@ model.add(MaxPooling2D(pool_size=(2,2)))
 model.add(Convolution2D(64, (3,3), activation='relu', padding='same'))
 model.add(Convolution2D(64, (3,3), activation='relu'))
 model.add(MaxPooling2D(pool_size=(2,2)))
+model.add(Dropout(0.2))
 
 model.add(Convolution2D(64, (3,3), activation='relu', padding='same'))
 model.add(Convolution2D(64, (3,3), activation='relu'))
 model.add(MaxPooling2D(pool_size=(2,2)))
+model.add(Dense(64, activation='relu'))
 model.add(Dropout(0.25))
 
 
@@ -188,7 +190,10 @@ model.layers[0].input_shape
 model.layers[0].output_shape            
 model.layers[0].get_weights()
 np.shape(model.layers[0].get_weights()[0])
-model.layers[0].trainable
+if model.layers[0].trainable:
+	print("Model is Trainable")
+else:
+	print("Please modify the model to make it trainable")
 #plot_model(model, to_file='model_plot.png')
 #%%
 # Training
@@ -340,11 +345,13 @@ y_pred = np.argmax(Y_pred, axis=1)
 print(y_pred)
 #y_pred = model.predict_classes(X_test)
 #print(y_pred)
-target_names = ['class 0(Diseased Cotton Plant)', 'class 1(Healthy Cotton)']
+target_names = names
                     
 print(classification_report(np.argmax(y_test,axis=1), y_pred,target_names=target_names))
 
 print(confusion_matrix(np.argmax(y_test,axis=1), y_pred))
+
+
 
 
 # Plotting the confusion matrix
@@ -408,6 +415,7 @@ with open("model.json", "w") as json_file:
     json_file.write(model_json)
 # serialize weights to HDF5
 model.save_weights("model.h5")
+model.save("install_model.h5")
 print("Saved model to disk")
 
 # load json and create model

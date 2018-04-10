@@ -23,7 +23,7 @@ data_path.replace('\\', '/')
 
 #%%
 #Load and Pre-Process the image
-img_name='dimg4.jpg'
+img_name='img6.jpg'
 image=cv2.imread(data_path+'/'+img_name)
 orig=image.copy()
 
@@ -59,7 +59,14 @@ for i in range(0,len(result[0])):
 	if result[0][i]>max:
 		max=result[0][i]
 		label=i
-category=['Diseased Cotton Plant','Healthy Cotton Plant']
+
+PATH = os.getcwd()
+# Define data path
+data_path = PATH + '\Dataset'
+data_path.replace('\\', '/')
+data_dir_list = os.listdir(data_path)
+
+category=data_dir_list
 out=category[label]
 label = "{}: {:.2f}%".format(out, max * 100)
 

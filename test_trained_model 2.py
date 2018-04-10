@@ -6,7 +6,7 @@ PATH = os.getcwd()
 data_path = PATH + '\path_test'
 data_path.replace('\\', '/')
 
-img=cv2.imread(data_path+'/'+'img1.jpg')
+img=cv2.imread(data_path+'/'+'dimg6.jpg')
 img=cv2.resize(img,(64,64))
 img=img.astype('float32')
 img/=255
@@ -28,13 +28,19 @@ print("Loaded model from disk")
 
 result=loaded_model.predict(img)
 max=result[0][0]
-label=0
+
 for i in range(0,len(result[0])):
 	if result[0][i]>max:
 		max=result[0][i]
 		label=i
-		print('loop:',label)
-category=['Diseased Cotton Plant','Healthy Cotton Plant']
+		
+PATH = os.getcwd()
+# Define data path
+data_path = PATH + '\Dataset'
+data_path.replace('\\', '/')
+data_dir_list = os.listdir(data_path)
+
+category=data_dir_list
 print(max)
 print('last value:',label)
 print('Model Predicted this as',category[label])
