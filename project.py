@@ -28,8 +28,8 @@ num_classes=len(os.listdir(data_path))
 img_rows=64
 img_cols=64
 num_channel=1
-num_epoch=50
-batch_size=128
+num_epoch=45
+batch_size=256
 
 img_data_list=[]
 
@@ -154,19 +154,19 @@ model.add(Convolution2D(32, (3,3), activation='relu'))
 model.add(MaxPooling2D(pool_size=(2,2)))
 
 model.add(Convolution2D(64, (3,3), activation='relu', padding='same'))
-model.add(Convolution2D(64, (3,3), activation='relu'))
+#model.add(Convolution2D(64, (3,3), activation='relu'))
 model.add(MaxPooling2D(pool_size=(2,2)))
 model.add(Dropout(0.2))
 
 model.add(Convolution2D(64, (3,3), activation='relu', padding='same'))
-model.add(Convolution2D(64, (3,3), activation='relu'))
+#model.add(Convolution2D(64, (3,3), activation='relu'))
 model.add(MaxPooling2D(pool_size=(2,2)))
 model.add(Dense(64, activation='relu'))
 model.add(Dropout(0.25))
 
 
 model.add(Convolution2D(128, (3,3), activation='relu', padding='same'))
-model.add(Convolution2D(128, (3,3), activation='tanh'))
+model.add(Convolution2D(128, (3,3), activation='relu'))
 model.add(MaxPooling2D(pool_size=(2,2)))
 model.add(Dropout(0.25))
 
